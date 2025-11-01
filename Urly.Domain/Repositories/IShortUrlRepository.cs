@@ -8,4 +8,5 @@ using Urly.Domain.Entities;
 namespace Urly.Domain.Repositories;
 public interface IShortUrlRepository : IRepository<ShortUrl>
 {
+    Task<bool> IsCodeUniqueAsync(string code);
 }

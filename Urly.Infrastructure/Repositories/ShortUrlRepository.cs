@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,5 +13,15 @@ public class ShortUrlRepository : Repository<ShortUrl>, IShortUrlRepository
 {
     public ShortUrlRepository(AppDbContext context) : base(context)
     {
+    }
+
+    public async Task<bool> IsCodeUniqueAsync(string code)
+    {
+        var shortUrl = await _context.ShortUrls
+                                     .FirstOrDefaultAsync(s => s.ShortCode == code);
+
+        if (shortUrl is null) { return false; }
+
+        return true;
     }
 }
