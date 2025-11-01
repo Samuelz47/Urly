@@ -8,6 +8,7 @@ namespace Urly.Domain.Entities;
 public class UrlClick
 {
     public int Id { get; set; }
+    public ShortUrl ShortUrl { get; set; }
     public int ShortUrlId { get; set; }
     public DateTime ClickedAtUtc { get; set; }
 }

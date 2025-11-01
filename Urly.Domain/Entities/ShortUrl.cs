@@ -15,4 +15,5 @@ public class ShortUrl
     public string ShortCode { get; set; }
     public DateTime CreateAtUtc { get; set; }
     public int? UserId { get; set; }
+    public ICollection<UrlClick> Clicks { get; set; } = new List<UrlClick>();
 }
