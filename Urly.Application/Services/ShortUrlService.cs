@@ -39,17 +39,14 @@ public class ShortUrlService : IShortUrlService
             if (codeIsUnique) { break; }
         }
 
-        var shortUrl = new ShortUrl
-        {
-            LongURL = createDto.LongURL,
-            ShortCode = shortCode,
-            CreateAtUtc = DateTime.UtcNow
-        };
+        var shortUrl = _mapper.Map<ShortUrl>(createDto);
+        shortUrl.ShortCode = shortCode;
+        shortUrl.CreateAtUtc = DateTime.UtcNow;
 
         _shortUrlRepository.Create(shortUrl);
         await _uow.CommitAsync();
+
         var responseDto = _mapper.Map<ShortUrlDTO>(shortUrl);
-        responseDto.ShortURL = $"https://urly.com/{shortUrl.ShortCode}";
         return responseDto;
     }
 
