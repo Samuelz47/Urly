@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 namespace Urly.Application.DTOs;
 public class ShortUrlDTO
 {
-    public string ShortURL { get; set; }
     public string FullShortUrl { get; set; }
-    public string LongUrl { get; set; }
+    public string LongURL { get; set; }
+    public string ShortCode { get; set; }
+    public DateTime CreateAtUtc { get; set; }
 }

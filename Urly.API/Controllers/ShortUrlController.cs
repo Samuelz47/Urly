@@ -4,7 +4,7 @@ using Urly.Application.DTOs;
 using Urly.Application.Interfaces;
 
 namespace Urly.API.Controllers;
-[Route("[controller]")]
+[Route("/")]
 [ApiController]
 public class ShortUrlController : ControllerBase
 {
@@ -15,14 +15,14 @@ public class ShortUrlController : ControllerBase
         _shortUrlService = shortUrlService;
     }
 
-    [HttpPost("create")]
+    [HttpPost]
     public async Task<ActionResult<ShortUrlDTO>> CreateShortUrl(ShortUrlForRegistrationDTO dto)
     {
         var shortUrl = await _shortUrlService.CreateShortUrlAsync(dto);
 
         return CreatedAtAction(
                 nameof(GetAnalytics), // Nome do método que busca o recurso
-                new { code = shortUrl.ShortURL }, // Parâmetro da rota do outro método
+                new { code = shortUrl.ShortCode }, // Parâmetro da rota do outro método
                 shortUrl // O objeto criado
             );
     }

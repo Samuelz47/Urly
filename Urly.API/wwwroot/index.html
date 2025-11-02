@@ -81,7 +81,6 @@
     </div>
 
     <script>
-        // Obtém a URL base da API (funciona localmente e em deploy)
         const apiBaseUrl = window.location.origin;
 
         async function createShortUrl() {
@@ -93,29 +92,38 @@
             errorDiv.style.display = 'none';
 
             try {
-                // Chama o seu endpoint POST /
-                // (Lembre-se que o seu Controller está em [Route("/")])
+                // O DTO espera "LongURL" (maiúsculo)
+                const payload = {
+                    LongURL: longUrl
+                };
+
+                // O Controller está na rota "/" e método POST
                 const response = await fetch(`${apiBaseUrl}/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ longURL: longUrl }), // O DTO 'CreateShortUrlDto'
+                    body: JSON.stringify(payload),
                 });
 
                 if (!response.ok) {
-                    // Trata erros de validação (ex: 400 Bad Request)
-                    const errorData = await response.json();
-                    throw new Error(errorData.title || 'Erro ao criar o link.');
+                    // Se a resposta não for JSON (ex: erro 500 ou 404), isto vai falhar
+                    const errorText = await response.text();
+                    try {
+                        // Tenta analisar o erro como JSON (erros de validação do .NET são assim)
+                        const errorData = JSON.parse(errorText);
+                        throw new Error(errorData.detail || errorData.title || 'Erro ao criar o link.');
+                    } catch (e) {
+                        // Se não for JSON (ex: um 500 Internal Server Error HTML), mostra o texto
+                        throw new Error(`Erro ${response.status}: ${response.statusText}`);
+                    }
                 }
 
-                // Pega o DTO 'ShortUrlDto' da resposta (201 Created)
+                // Se a resposta for OK (201 Created), ela é JSON
                 const data = await response.json();
 
-                // Mostra o resultado
                 const linkElement = document.getElementById('shortUrlLink');
-                // Usamos o FullShortUrl que o seu serviço criou!
-                // (Mas se o seu DTO só retornar o 'shortCode', teríamos que montar o link aqui)
+                // O DTO de resposta agora tem 'fullShortUrl'
                 linkElement.href = data.fullShortUrl;
                 linkElement.textContent = data.fullShortUrl;
                 resultDiv.style.display = 'block';
