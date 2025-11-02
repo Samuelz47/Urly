@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,5 +13,10 @@ public class UrlClickRepository : Repository<UrlClick>, IUrlClickRepository
 {
     public UrlClickRepository(AppDbContext context) : base(context)
     {
+    }
+
+    public async Task<int> CountByShortUrlIdAsync(int shortUrlId)
+    {
+        return await _context.UrlClickers.CountAsync(c => c.ShortUrlId == shortUrlId);
     }
 }

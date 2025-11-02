@@ -8,4 +8,5 @@ using Urly.Domain.Entities;
 namespace Urly.Domain.Repositories;
 public interface IUrlClickRepository : IRepository<UrlClick>
 {
+    Task<int> CountByShortUrlIdAsync(int shortUrlId);
 }

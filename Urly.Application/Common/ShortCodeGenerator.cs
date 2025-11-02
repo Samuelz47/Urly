@@ -19,8 +19,6 @@ public static class ShortCodeGenerator
         for (int i = 0; i < length; i++)
         {
             // 1. Obter um número aleatório criptograficamente seguro.
-            // Usamos RandomNumberGenerator em vez de Random() porque Random()
-            // pode gerar sequências repetidas se chamado muito rapidamente.
             // GetInt32(maxValue) gera um número entre 0 e (maxValue - 1).
             int randomIndex = RandomNumberGenerator.GetInt32(Alphabet.Length);
 
