@@ -11,7 +11,6 @@ public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-
     public DbSet<UrlClick> UrlClickers { get; set; }
     public DbSet<ShortUrl> ShortUrls { get; set; }
 

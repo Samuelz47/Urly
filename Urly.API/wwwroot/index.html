@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Urly - Encurtador</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #121212;
+            color: #eee;
+            display: grid;
+            place-items: center;
+            min-height: 80vh;
+        }
+
+        #container {
+            background: #1e1e1e;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            min-width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #00bcd4;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 1rem;
+            box-sizing: border-box;
+            background: #333;
+            border: 1px solid #555;
+            color: #eee;
+            border-radius: 4px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #00bcd4;
+            color: #121212;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #result {
+            margin-top: 1.5rem;
+            background: #2a2a2a;
+            padding: 1rem;
+            border-radius: 4px;
+            display: none;
+        }
+
+            #result a {
+                color: #81d4fa;
+                word-break: break-all;
+            }
+
+        #error {
+            margin-top: 1.5rem;
+            color: #ff8a80;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Urly</h1>
+        <input type="text" id="longUrlInput" placeholder="Cole a sua URL longa aqui...">
+        <button onclick="createShortUrl()">Encurtar</button>
+        <div id="result">
+            <span>Link curto: </span><a id="shortUrlLink" href="#" target="_blank"></a>
+        </div>
+        <div id="error" role="alert"></div>
+    </div>
+
+    <script>
+        // Obtém a URL base da API (funciona localmente e em deploy)
+        const apiBaseUrl = window.location.origin;
+
+        async function createShortUrl() {
+            const longUrl = document.getElementById('longUrlInput').value;
+            const resultDiv = document.getElementById('result');
+            const errorDiv = document.getElementById('error');
+
+            resultDiv.style.display = 'none';
+            errorDiv.style.display = 'none';
+
+            try {
+                // Chama o seu endpoint POST /
+                // (Lembre-se que o seu Controller está em [Route("/")])
+                const response = await fetch(`${apiBaseUrl}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ longURL: longUrl }), // O DTO 'CreateShortUrlDto'
+                });
+
+                if (!response.ok) {
+                    // Trata erros de validação (ex: 400 Bad Request)
+                    const errorData = await response.json();
+                    throw new Error(errorData.title || 'Erro ao criar o link.');
+                }
+
+                // Pega o DTO 'ShortUrlDto' da resposta (201 Created)
+                const data = await response.json();
+
+                // Mostra o resultado
+                const linkElement = document.getElementById('shortUrlLink');
+                // Usamos o FullShortUrl que o seu serviço criou!
+                // (Mas se o seu DTO só retornar o 'shortCode', teríamos que montar o link aqui)
+                linkElement.href = data.fullShortUrl;
+                linkElement.textContent = data.fullShortUrl;
+                resultDiv.style.display = 'block';
+
+            } catch (error) {
+                errorDiv.textContent = `Erro: ${error.message}`;
+                errorDiv.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
