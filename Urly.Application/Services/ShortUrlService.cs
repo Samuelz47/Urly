@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,12 +16,14 @@ public class ShortUrlService : IShortUrlService
     private readonly IShortUrlRepository _shortUrlRepository;
     private readonly IUrlClickRepository _urlClickRepository;
     private readonly IUnitOfWork _uow;
+    private readonly IMapper _mapper;
 
-    public ShortUrlService(IShortUrlRepository shortUrlRepository, IUnitOfWork uow, IUrlClickRepository urlClickRepository)
+    public ShortUrlService(IShortUrlRepository shortUrlRepository, IUnitOfWork uow, IUrlClickRepository urlClickRepository, IMapper mapper)
     {
         _shortUrlRepository = shortUrlRepository;
         _uow = uow;
         _urlClickRepository = urlClickRepository;
+        _mapper = mapper;
     }
 
     public async Task<ShortUrlDTO> CreateShortUrlAsync(ShortUrlForRegistrationDTO createDto)
@@ -45,8 +48,8 @@ public class ShortUrlService : IShortUrlService
 
         _shortUrlRepository.Create(shortUrl);
         await _uow.CommitAsync();
-
-        var responseDto = new ShortUrlDTO { ShortURL = $"https://urly.com/{shortUrl.ShortCode}" };
+        var responseDto = _mapper.Map<ShortUrlDTO>(shortUrl);
+        responseDto.ShortURL = $"https://urly.com/{shortUrl.ShortCode}";
         return responseDto;
     }
 
