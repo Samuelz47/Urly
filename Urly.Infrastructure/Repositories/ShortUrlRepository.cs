@@ -17,11 +17,8 @@ public class ShortUrlRepository : Repository<ShortUrl>, IShortUrlRepository
 
     public async Task<bool> IsCodeUniqueAsync(string code)
     {
-        var shortUrl = await _context.ShortUrls
-                                     .FirstOrDefaultAsync(s => s.ShortCode == code);
+        bool exists = await _context.ShortUrls.AnyAsync(s => s.ShortCode == code);
 
-        if (shortUrl is null) { return false; }
-
-        return true;
+        return !exists;
     }
 }
