@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Urly.Application.DTOs;
 using Urly.Application.Interfaces;
+
 
 namespace Urly.API.Controllers;
 [Route("/")]
 [ApiController]
+[EnableRateLimiting("fixed-by-ip")]
 public class ShortUrlController : ControllerBase
 {
     private readonly IShortUrlService _shortUrlService;
