@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,13 +18,15 @@ public class ShortUrlService : IShortUrlService
     private readonly IUrlClickRepository _urlClickRepository;
     private readonly IUnitOfWork _uow;
     private readonly IMapper _mapper;
+    private readonly IDistributedCache _cache;
 
-    public ShortUrlService(IShortUrlRepository shortUrlRepository, IUnitOfWork uow, IUrlClickRepository urlClickRepository, IMapper mapper)
+    public ShortUrlService(IShortUrlRepository shortUrlRepository, IUnitOfWork uow, IUrlClickRepository urlClickRepository, IMapper mapper, IDistributedCache cache)
     {
         _shortUrlRepository = shortUrlRepository;
         _uow = uow;
         _urlClickRepository = urlClickRepository;
         _mapper = mapper;
+        _cache = cache;
     }
 
     public async Task<ShortUrlDTO> CreateShortUrlAsync(ShortUrlForRegistrationDTO createDto)
@@ -52,20 +55,41 @@ public class ShortUrlService : IShortUrlService
 
     public async Task<string?> GetLongUrlAndRegisterClickAsync(string code)
     {
-        var shortUrl = await _shortUrlRepository.GetAsync(c => c.ShortCode == code);
+        string? longUrl;
+        string cacheKey = $"url:{code}";
 
-        if (shortUrl is null) { return null; }
+        longUrl = await _cache.GetStringAsync(cacheKey);
+
+        ShortUrl? shortUrl = null;
+
+        if (string.IsNullOrEmpty(longUrl))
+        {
+            shortUrl = await _shortUrlRepository.GetAsync(c => c.ShortCode == code);
+            if (shortUrl is null) { return null; }
+
+            longUrl = shortUrl.LongURL;
+
+            var cacheOptions = new DistributedCacheEntryOptions()
+                .SetAbsoluteExpiration(TimeSpan.FromHours(1));
+            await _cache.SetStringAsync(cacheKey, longUrl, cacheOptions);
+        }
+
+        if (shortUrl is null)
+        {
+            shortUrl = await _shortUrlRepository.GetAsync(c => c.ShortCode == code);
+            if (shortUrl is null) return null;
+        }
 
         var urlClick = new UrlClick
         {
             ShortUrlId = shortUrl.Id,
-            ShortUrl = shortUrl,
             ClickedAtUtc = DateTime.UtcNow
         };
 
         _urlClickRepository.Create(urlClick);
         await _uow.CommitAsync();
-        return shortUrl.LongURL;
+
+        return longUrl;
     }
 
     public async Task<UrlAnalyticsDTO?> GetUrlAnalyticsAsync(string code)

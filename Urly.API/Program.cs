@@ -37,6 +37,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString)
 );
 
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetValue<string>("Redis:ConnectionString");
+    options.InstanceName = "Urly_"; // Um prefixo para as chaves no Redis
+});
+
 builder.Services.AddAutoMapper(typeof(ShortUrlMappingProfile).Assembly);
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
