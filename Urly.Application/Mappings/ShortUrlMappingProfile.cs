@@ -14,8 +14,6 @@ public class ShortUrlMappingProfile : Profile
     {
         CreateMap<ShortUrlForRegistrationDTO, ShortUrl>();
 
-        CreateMap<ShortUrl, ShortUrlDTO>()
-                .ForMember(dest => dest.FullShortUrl,
-                            opt => opt.MapFrom(src => $"https://localhost:7032/{src.ShortCode}"));
+        CreateMap<ShortUrl, ShortUrlDTO>();
     }
 }

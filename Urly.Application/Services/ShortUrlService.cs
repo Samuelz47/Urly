@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,14 +20,16 @@ public class ShortUrlService : IShortUrlService
     private readonly IUnitOfWork _uow;
     private readonly IMapper _mapper;
     private readonly IDistributedCache _cache;
+    private readonly IConfiguration _configuration;
 
-    public ShortUrlService(IShortUrlRepository shortUrlRepository, IUnitOfWork uow, IUrlClickRepository urlClickRepository, IMapper mapper, IDistributedCache cache)
+    public ShortUrlService(IShortUrlRepository shortUrlRepository, IUnitOfWork uow, IUrlClickRepository urlClickRepository, IMapper mapper, IDistributedCache cache, IConfiguration configuration)
     {
         _shortUrlRepository = shortUrlRepository;
         _uow = uow;
         _urlClickRepository = urlClickRepository;
         _mapper = mapper;
         _cache = cache;
+        _configuration = configuration;
     }
 
     public async Task<ShortUrlDTO> CreateShortUrlAsync(ShortUrlForRegistrationDTO createDto)
@@ -50,6 +53,8 @@ public class ShortUrlService : IShortUrlService
         await _uow.CommitAsync();
 
         var responseDto = _mapper.Map<ShortUrlDTO>(shortUrl);
+        var baseUrl = _configuration["AppBaseUrl"] ?? "https://localhost:7032";
+        responseDto.FullShortUrl = $"{baseUrl}/{responseDto.ShortCode}";
         return responseDto;
     }
 
