@@ -6,7 +6,7 @@ using Urly.Application.Interfaces;
 
 
 namespace Urly.API.Controllers;
-[Route("/")]
+[Route("api")]
 [ApiController]
 [EnableRateLimiting("fixed-by-ip")]
 public class ShortUrlController : ControllerBase

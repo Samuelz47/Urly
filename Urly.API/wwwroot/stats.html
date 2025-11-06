@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Urly - Estatísticas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #121212;
+            color: #eee;
+            display: grid;
+            place-items: center;
+            min-height: 80vh;
+        }
+
+        #container {
+            background: #1e1e1e;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            min-width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #00bcd4;
+            margin-bottom: 0.5rem;
+        }
+        /* Estilos específicos para esta página */
+        p {
+            font-size: 1.1rem;
+            color: #aaa;
+            margin-top: 0;
+            word-break: break-all;
+        }
+
+        #clickCount {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #81d4fa;
+            margin: 1.5rem 0;
+        }
+
+        #error {
+            color: #ff8a80;
+        }
+
+        a {
+            color: #00bcd4;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Estatísticas</h1>
+        <p id="shortUrlDisplay">A carregar...</p>
+        <div id="clickCount">...</div>
+        <div id="error" role="alert"></div>
+        <a href="index.html">Voltar para o Início</a>
+    </div>
+
+    <script>
+        // Obtém a URL base da API (ex: https://localhost:7032)
+        const apiBaseUrl = window.location.origin;
+
+        // Função que corre assim que a página carrega
+        window.onload = async () => {
+            const errorDiv = document.getElementById('error');
+            const clickCountDiv = document.getElementById('clickCount');
+            const shortUrlDiv = document.getElementById('shortUrlDisplay');
+
+            try {
+                // 1. LER O CÓDIGO DA URL
+                // Esta é a magia: lê os parâmetros da URL (ex: ?code=aZb3xY)
+                const params = new URLSearchParams(window.location.search);
+                const code = params.get('code');
+
+                if (!code) {
+                    throw new Error("Nenhum código de URL foi fornecido. (Ex: /stats.html?code=SEUCODIGO)");
+                }
+
+                // Mostra o link que estamos a analisar
+                shortUrlDiv.textContent = `${apiBaseUrl}/${code}`;
+
+                // 2. CHAMAR A API DE STATS
+                // (Chama o seu endpoint GET /{code}/stats)
+                const response = await fetch(`${apiBaseUrl}/${code}/stats`);
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error("Link não encontrado.");
+                    }
+                    throw new Error(`Erro ${response.status} ao buscar estatísticas.`);
+                }
+
+                // 3. LER O JSON (O UrlAnalyticsDTO)
+                const data = await response.json();
+
+                // 4. MOSTRAR OS DADOS
+                clickCountDiv.textContent = data.totalClicks;
+
+            } catch (error) {
+                clickCountDiv.style.display = 'none'; // Esconde o "..."
+                errorDiv.textContent = `Erro: ${error.message}`;
+            }
+        };
+    </script>
+</body>
+</html>
