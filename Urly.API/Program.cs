@@ -75,6 +75,21 @@ builder.Services.AddRateLimiter(options =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<Urly.Infrastructure.Context.AppDbContext>();
+
+    try
+    {
+        await dbContext.Database.MigrateAsync();
+        Console.WriteLine("Migrações do Urly aplicadas com sucesso.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Erro ao aplicar migrações do Urly: {ex.Message}");
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
