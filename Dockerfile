@@ -10,9 +10,6 @@ COPY src/Urly.Domain/Urly.Domain.csproj src/Urly.Domain/
 COPY src/Urly.Infrastructure/Urly.Infrastructure.csproj src/Urly.Infrastructure/
 COPY src/Urly.Shared/Urly.Shared.csproj src/Urly.Shared/
 
-# Copia os projetos de TESTE (necessários para o 'restore')
-COPY src/Urly.Application.Tests/Urly.Application.Tests.csproj src/Urly.Application.Tests/
-COPY src/Urly.API.Tests/Urly.API.Tests.csproj src/Urly.API.Tests/
 
 # Restaura as dependências
 RUN dotnet restore "Urly.sln"
