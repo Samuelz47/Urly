@@ -92,39 +92,32 @@
             errorDiv.style.display = 'none';
 
             try {
-                // O DTO espera "LongURL" (maiúsculo)
                 const payload = {
                     LongURL: longUrl
                 };
 
-                // O Controller está na rota "/" e método POST
-                const response = await fetch(`${apiBaseUrl}/`, {
+                const response = await fetch(`${apiBaseUrl}/api/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    const response = await fetch(`${apiBaseUrl}/api/`, {
-                        method: 'POST',
+                    body: JSON.stringify(payload),
                 });
 
                 if (!response.ok) {
-                    // Se a resposta não for JSON (ex: erro 500 ou 404), isto vai falhar
                     const errorText = await response.text();
                     try {
-                        // Tenta analisar o erro como JSON (erros de validação do .NET são assim)
                         const errorData = JSON.parse(errorText);
                         throw new Error(errorData.detail || errorData.title || 'Erro ao criar o link.');
                     } catch (e) {
-                        // Se não for JSON (ex: um 500 Internal Server Error HTML), mostra o texto
                         throw new Error(`Erro ${response.status}: ${response.statusText}`);
                     }
                 }
 
-                // Se a resposta for OK (201 Created), ela é JSON
                 const data = await response.json();
 
                 const linkElement = document.getElementById('shortUrlLink');
-                // O DTO de resposta agora tem 'fullShortUrl'
+                // O DTO de resposta tem 'fullShortUrl'
                 linkElement.href = data.fullShortUrl;
                 linkElement.textContent = data.fullShortUrl;
                 resultDiv.style.display = 'block';

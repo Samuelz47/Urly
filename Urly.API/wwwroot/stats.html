@@ -26,7 +26,7 @@
             color: #00bcd4;
             margin-bottom: 0.5rem;
         }
-        /* Estilos específicos para esta página */
+
         p {
             font-size: 1.1rem;
             color: #aaa;
@@ -62,18 +62,14 @@
     </div>
 
     <script>
-        // Obtém a URL base da API (ex: https://localhost:7032)
         const apiBaseUrl = window.location.origin;
 
-        // Função que corre assim que a página carrega
         window.onload = async () => {
             const errorDiv = document.getElementById('error');
             const clickCountDiv = document.getElementById('clickCount');
             const shortUrlDiv = document.getElementById('shortUrlDisplay');
 
             try {
-                // 1. LER O CÓDIGO DA URL
-                // Esta é a magia: lê os parâmetros da URL (ex: ?code=aZb3xY)
                 const params = new URLSearchParams(window.location.search);
                 const code = params.get('code');
 
@@ -81,12 +77,9 @@
                     throw new Error("Nenhum código de URL foi fornecido. (Ex: /stats.html?code=SEUCODIGO)");
                 }
 
-                // Mostra o link que estamos a analisar
-                shortUrlDiv.textContent = `${apiBaseUrl}/${code}`;
+                shortUrlDiv.textContent = `${apiBaseUrl}/api/${code}`;
 
-                // 2. CHAMAR A API DE STATS
-                // (Chama o seu endpoint GET /{code}/stats)
-                const response = await fetch(`${apiBaseUrl}/${code}/stats`);
+                const response = await fetch(`${apiBaseUrl}/api/${code}/stats`);
 
                 if (!response.ok) {
                     if (response.status === 404) {
@@ -95,14 +88,12 @@
                     throw new Error(`Erro ${response.status} ao buscar estatísticas.`);
                 }
 
-                // 3. LER O JSON (O UrlAnalyticsDTO)
                 const data = await response.json();
 
-                // 4. MOSTRAR OS DADOS
                 clickCountDiv.textContent = data.totalClicks;
 
             } catch (error) {
-                clickCountDiv.style.display = 'none'; // Esconde o "..."
+                clickCountDiv.style.display = 'none';
                 errorDiv.textContent = `Erro: ${error.message}`;
             }
         };

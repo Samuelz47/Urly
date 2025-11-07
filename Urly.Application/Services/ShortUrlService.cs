@@ -53,8 +53,8 @@ public class ShortUrlService : IShortUrlService
         await _uow.CommitAsync();
 
         var responseDto = _mapper.Map<ShortUrlDTO>(shortUrl);
-        var baseUrl = _configuration["AppBaseUrl"] ?? "https://localhost:7032";
-        responseDto.FullShortUrl = $"{baseUrl}/{responseDto.ShortCode}";
+        var baseUrl = _configuration["AppBaseUrl"];
+        responseDto.FullShortUrl = $"{baseUrl}/api/{responseDto.ShortCode}";
         return responseDto;
     }
 
